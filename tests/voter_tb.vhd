@@ -62,13 +62,13 @@ begin
         inputs <= "0010";
         wait for clk_period;
         assert (output = '0') report "Output not 0 after input seq 0001, 0010";
-        assert (status = "011") report "Status not 011 after input seq 0001, 0010";
+        assert (status = "010") report "Status not 011 after input seq 0001, 0010";
         
         -- OK
         inputs <= "1110";
         wait for clk_period;
         assert (output = '1') report "Output not 1 after input seq 0001, 0010, 1110";
-        assert (status = "011") report "Status not 011 after input seq 0001, 0010, 1110";
+        assert (status = "010") report "Status not 011 after input seq 0001, 0010, 1110";
         
         -- Third failure
         inputs <= "0110";

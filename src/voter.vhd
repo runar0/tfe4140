@@ -49,7 +49,7 @@ begin
                 case mask is 
                     when "1111" => status <= "000";
                     when "0111"|"1011"|"1101"|"1110" => status <= "001";
-                    when "0011"|"0101"|"1001"|"1010"|"1100"|"0110" => status <= "011";
+                    when "0011"|"0101"|"1001"|"1010"|"1100"|"0110" => status <= "010";
                     when others => status <= "111";
                 end case;       
             end if;                
