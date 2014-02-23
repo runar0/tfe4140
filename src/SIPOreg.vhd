@@ -14,12 +14,12 @@ end entity;
 architecture behaviour of SIPOreg is
 begin
 	
-	process(clk) 
-        variable value : std_logic_vector(N-1 downto 0) := (others => '0');
+	process(clk, shift) 
+        variable value : std_logic_vector(N-2 downto 0) := (others => '0');
 	begin
 	    if rising_edge(clk) and shift = '1' then
-	        value := value(N-2 downto 0) & data_in;
-	        data_out <= value;
+	        data_out <= value & data_in;
+	        value := value(N-3 downto 0) & data_in;
 	    end if;
 	end process;
 	

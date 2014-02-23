@@ -50,7 +50,7 @@ begin
     
     data_out <= voted_word & voter_status;
 	
-	process(clk)
+	process(clk, reset, next_state)
 	begin
 	    if reset = '1' then
 	        current_state <= READY;
@@ -67,31 +67,33 @@ begin
     
     process(current_state, di_ready, mc_input, counter)
     begin
-        if current_state = READY then
-            shift <= '0';
-            do_ready <= '0';
-            if di_ready = '1' then            
-                voter_input <= mc_input;
-                next_state <= RUNNING;
-            else
-                voter_input <= (others => '0');
-                next_state <= READY;
-            end if;                
-        elsif current_state = RUNNING then
-            do_ready <= '0';
-            shift <= '1';
-            if counter = 8 then
-                next_state <= FINALIZE;
-                voter_input <= "0000";
-            else 
-                next_state <= RUNNING;
-                voter_input <= mc_input;
-            end if;
-        elsif current_state = FINALIZE then
-            shift <= '0';
-            do_ready <= '1';
-            next_state <= READY;
-        end if;
+    	case current_state is
+    		when READY =>
+	    		shift <= '0';
+	            do_ready <= '0';
+	            if di_ready = '1' then            
+	                voter_input <= mc_input;
+	                next_state <= RUNNING;
+	            else
+	                voter_input <= (others => '0');
+	                next_state <= READY;
+	            end if;  
+	        when RUNNING =>
+	            do_ready <= '0';
+	            shift <= '1';
+	            if counter = 8 then
+	            voter_input <= (others => '0');
+	                next_state <= FINALIZE;
+	            else 
+	                voter_input <= mc_input;
+	                next_state <= RUNNING;
+	            end if;       
+	        when others => -- FINALIZE
+	            shift <= '0';
+	            do_ready <= '1';
+	            voter_input <= (others => '0');
+	            next_state <= READY;
+	    end case;
         	    
 	end process;
 	
