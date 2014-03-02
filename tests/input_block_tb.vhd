@@ -35,6 +35,8 @@ begin
 	
 	process
 	begin
+        assert false report "Start." severity note;
+        
 	    mc_input <= "0000";
 	    di_ready <= '0';
 	    
@@ -69,6 +71,7 @@ begin
 	    assert (data_out(2 downto 0) = "000") report "Status not 0 as expected";
 	    
 	    
+        assert false report "Done." severity note;
 	    
 	    wait;
 	    

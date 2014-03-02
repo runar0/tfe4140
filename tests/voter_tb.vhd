@@ -4,8 +4,6 @@ use ieee.std_logic_1164.all ;
 entity voter_tb is
 end voter_tb;
 
--- 
-
 architecture arch of voter_tb is
 
     component voter is
@@ -36,6 +34,9 @@ begin
 
     stim_proc: process
     begin
+    
+        assert false report "Start." severity note;
+    
         -- Hold reset
         reset <= '1';
         wait for clk_period*2;
@@ -75,6 +76,8 @@ begin
         wait for clk_period;
         assert (output = '0') report "Output not 1 after input seq 0001, 0010, 1110, 0110";
         assert (status = "111") report "Status not 011 after input seq 0001, 0010, 1110, 0110";
+    
+        assert false report "Done." severity note;
     
         wait;
     end process;

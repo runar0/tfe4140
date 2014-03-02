@@ -40,6 +40,7 @@ begin
 	
 	process
 	begin
+        assert false report "Start." severity note;
 		voted_data <= "10101010000";
 		wait for clk_period;
 		
@@ -82,6 +83,8 @@ begin
 		wait for clk_period;
 		assert (data_out = '0') report "data_out not 1 @ ecc(0)";
 		wait for clk_period;
+		
+        assert false report "Done." severity note;
 		wait; 
 	end process;
 end tb_arch;

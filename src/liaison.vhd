@@ -42,6 +42,6 @@ begin
     input : input_block port map(clk, reset, di_ready, mp_data, input_data_out, input_do_ready);
     
     -- output block
-    output : output_block port map(clk,input_data_out, input_do_ready, do_ready, voted_data);
+    output : output_block port map(clk, input_data_out, input_do_ready, do_ready, voted_data);
 	
 end architecture;
