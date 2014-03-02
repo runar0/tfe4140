@@ -25,7 +25,7 @@ begin
         variable masked : std_logic_vector(3 downto 0);
         -- used to calculate status output
         variable state : std_logic_vector(1 downto 0);
-        -- 
+        -- bit vector used to mark inputs that were wrong in a cycle
         variable wrong : std_logic_vector(3 downto 0);
     begin
         if (rising_edge(clk)) then
@@ -33,7 +33,6 @@ begin
                 output <= '0';
                 status <= "000";
                 mask := "1111";
-                state := "00";
             else
                 -- A(B+C+D) + B(C+D) + CD (dead mcu's contribute a 0)
                 --  We define that two 1's and two 0's produce a 1

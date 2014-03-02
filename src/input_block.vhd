@@ -30,7 +30,7 @@ architecture behaviour of input_block is
 	    );
 	end component;
 	
-	type state is (READY, RUNNING, FINALIZE);
+	type state is (READY, BIT7, BIT6, BIT5, BIT4, BIT3, BIT2, BIT1, BIT0, FINALIZE);
 	signal current_state, next_state : state;
 	
 	-- Voter input and outputs
@@ -41,8 +41,6 @@ architecture behaviour of input_block is
 	-- Shift register control signal and word output
 	signal shift : std_logic;	
 	signal voted_word : std_logic_vector(7 downto 0);
-	
-	signal counter : integer;
 begin
 
     voter_1bit : voter port map (voter_input, clk, reset, voted_result, voter_status);
@@ -52,47 +50,66 @@ begin
 	
 	process(clk, reset, next_state)
 	begin
-	    if reset = '1' then
-	        current_state <= READY;
-	        counter <= 0;
-	    elsif rising_edge(clk) then
-	        current_state <= next_state;
-            if next_state = RUNNING then
-                counter <= counter + 1;
-            else 
-                counter <= 0;
-            end if;
+	    if rising_edge(clk) then
+	    	if reset = '1' then
+		    	current_state <= READY;
+	    	else 
+		        current_state <= next_state;
+	        end if;
 	    end if;
     end process;
     
-    process(current_state, di_ready, mc_input, counter)
+    process(current_state, di_ready, mc_input)
     begin
+	    do_ready <= '0';
     	case current_state is
-    		when READY =>
-	    		shift <= '0';
-	            do_ready <= '0';
-	            if di_ready = '1' then            
+    		when READY => 
+	            if di_ready = '1' then
+					shift <= '1';
 	                voter_input <= mc_input;
-	                next_state <= RUNNING;
+	                next_state <= BIT7;
 	            else
 	                voter_input <= (others => '0');
-	                next_state <= READY;
+	                next_state <= READY;   
+	    			shift <= '0';
 	            end if;  
-	        when RUNNING =>
-	            do_ready <= '0';
+	        when BIT7 =>
 	            shift <= '1';
-	            if counter = 8 then
+	            voter_input <= mc_input;
+	            next_state <= BIT6;
+	        when BIT6 =>
+	            shift <= '1';
+	            voter_input <= mc_input;
+	            next_state <= BIT5;
+	        when BIT5 =>
+	            shift <= '1';
+	            voter_input <= mc_input;
+	            next_state <= BIT4;
+	        when BIT4 =>
+	            shift <= '1';
+	            voter_input <= mc_input;
+	            next_state <= BIT3;
+	        when BIT3 =>
+	            shift <= '1';
+	            voter_input <= mc_input;
+	            next_state <= BIT2;
+	        when BIT2 =>
+	            shift <= '1';
+	            voter_input <= mc_input;
+	            next_state <= BIT1;
+	        when BIT1 =>
+	            shift <= '1';
+	            voter_input <= mc_input;
+	            next_state <= BIT0;
+	        when BIT0 =>
+	            shift <= '1';
+	            voter_input <= mc_input;
+	            next_state <= FINALIZE;
+			when FINALIZE =>
+				shift <= '0';		   		
 	            voter_input <= (others => '0');
-	                next_state <= FINALIZE;
-	            else 
-	                voter_input <= mc_input;
-	                next_state <= RUNNING;
-	            end if;       
-	        when others => -- FINALIZE
-	            shift <= '0';
+				next_state <= READY;
 	            do_ready <= '1';
-	            voter_input <= (others => '0');
-	            next_state <= READY;
 	    end case;
         	    
 	end process;

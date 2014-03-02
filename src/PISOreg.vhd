@@ -10,14 +10,13 @@ entity PISOreg is
 		write : in std_logic;
 		input : in std_logic_vector(N-1 downto 0);
 		output : out std_logic
-	     );
+	);
 end PISOreg;
 
-architecture arch of PISOreg is		  
-
+architecture arch of PISOreg is	
 begin
-	process(clk)
-	variable temp: std_logic_vector (N-2 downto 0);
+	process(clk) is
+		variable temp: std_logic_vector (N-2 downto 0);
 	begin
 	if rising_edge(clk)then	
 		if write = '1' then
