@@ -35,21 +35,21 @@ begin
                 mask := "1111";
             else
                 -- A(B+C+D) + B(C+D) + CD (dead mcu's contribute a 0)
-                --  We define that two 1's and two 0's produce a 1
+                -- We define that two 1's and two 0's produce a 1
                 masked := inputs and mask;
                 majority := (masked(3) and (masked(2) or masked(1) or masked(0))) 
                     or (masked(2) and (masked(1) or masked(0))) 
                     or (masked(1) and masked(0));
 				
 				-- Assuming little to no errors in fauly mcu
-				--majority := (inputs(0) or inputs(1)) and (inputs(2) or inputs(3));
+				-- majority := (inputs(0) or inputs(1)) and (inputs(2) or inputs(3));
                 output <= majority;
                     
                 -- Update the mask of any expected to be working mcu's to 0 if it 
                 -- disagrees with the majority
                 wrong := (majority & majority & majority & majority) xor masked;
                 wrong := wrong and mask;
-                mask := mask xor wrong;               
+                mask  := mask xor wrong;               
                                 
 				state(0) := mask(0) xor mask(1) xor mask(2) xor mask(3);
 				state(1) := (state(0) nor (mask(0) and mask(1) and mask(2) and mask(3)))
