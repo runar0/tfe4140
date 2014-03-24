@@ -63,12 +63,16 @@ begin
 	-- ),
 	
 	input_process: process begin
-	    assert false report "Liaison TB: input start" severity note;
+	    report "Starting test of liaison system" severity note;
+	    report "===============================" severity note;
+	    
+	    
+	    report "Liaison TB: input start" severity note;
 	    	    
 		for i in input'range loop
 		
 		    if input(i, 4)(0) = '1' then		        
-		        assert false report "Resetting before input #"&str(i);
+		        --report "Resetting before input #"&str(i);
 		        
 		        -- Wait for 8 periods, to make sure any output has completed, then reset
 		        if i /= 0 then wait for clk_period*8; end if;
@@ -94,10 +98,10 @@ begin
 		    -- min 15 cycle between inputs, 15-7 = 8
 		    wait for clk_period*8;
 		    wait until falling_edge(clk);
-		    assert false report "Input #"&str(i)&" done" severity note;
+		    --report "Input #"&str(i)&" done" severity note;
 		end loop;
 		
-		assert false report "Liaison TB: input complete" severity note;
+		report "Liaison TB: input complete" severity note;
 		wait;
 	end process;
 	
@@ -121,7 +125,7 @@ begin
 		    		    
 		    -- Compare actual and expected output
 		    if actual_output = output(i) then
-		        report "Output "&str(i)&": OK" severity warning;
+		        --report "Output "&str(i)&": OK" severity warning;
 		    else 
     		    report "Output "&str(i)&": Expected " & str(output(i)) & " got " & str(actual_output) severity error;
     		    errors := errors + 1;
