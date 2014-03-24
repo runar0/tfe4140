@@ -3,7 +3,6 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
-
 entity input_block is 
 	port(
         clk, reset, di_ready : in std_logic;

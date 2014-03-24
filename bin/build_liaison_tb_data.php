@@ -3,13 +3,13 @@
 /**
  * Create an array of all possible binary strings of a given length
  */
-function buildString($length, $length = "") {
+function buildString($length, $partial = "") {
     if (strlen($partial) == $length) {
         return [$partial];
     }
     return array_merge(
-        buildString($partial."0", $length),
-        buildString($partial."1", $length)
+        buildString($length, $partial."0"),
+        buildString($length, $partial."1")
     );
 }
 
@@ -18,7 +18,8 @@ function buildString($length, $length = "") {
  */
 function buildAllMcuInputBitCombinations() {
     $output = [];
-    for($mcu = 0; $mcu < 4; $mcu++) {
+    //for($mcu = 0; $mcu < 4; $mcu++) {
+    for($mcu = 0; $mcu < 1; $mcu++) {
         for($bit = 0; $bit < 8; $bit++) {
             $output[] = ['mcu' => $mcu, 'bit' => $bit];
         }
@@ -31,14 +32,19 @@ function buildPermuations($inputs, $maxerrors) {
     $positions = buildAllMcuInputBitCombinations();
     
     foreach($inputs as $input) {
-        $errors = [];
-        for($i = 0; $i < count($positions); $i++) {
-            $errors[] = $positions[$i];           
-            // TODO if maxerrors > 1
+        for($i = 0; $i < count($positions)-($maxerrors-1); $i++) {
+            $e = [$positions[$i]];
+            $errors = $maxerrors-1;
+            while($errors > 0) {
+                $err = $positions[$i+$maxerrors-$errors];
+                $err['mcu'] += $maxerrors-$errors;
+                $e[] = $err;
+                $errors --;
+            }
             
-            // Apply errors
-            foreach($errors as $error) {            
-                $modified = $input;
+            // Apply errors         
+            $modified = $input; 
+            foreach($e as $error) {   
                 $modified[$error['mcu']]{$error['bit']} = ($modified[$error['mcu']]{$error['bit']} + 1) % 2;
             }
             $return[] = $modified;
@@ -56,11 +62,7 @@ function buildInputAndOutputSets() {
     foreach(buildString(8) as $input) {
         $goodinputs[] = [$input, $input, $input, $input];
     }
-    
-    // Create all one and two error combinations
-    $oneerrinputs = buildPermuations($goodinputs, 1);
-    //$twoerrinputs = buildPermuations($goodinputs, 2);
-    
+        
     $return = ['inputs' => [], 'outputs' => []];
     foreach($goodinputs as $input) {
         $input[4] = "00000000";
@@ -70,17 +72,27 @@ function buildInputAndOutputSets() {
     // Reset at first input
     $return['inputs'][0][4] = "11111111";
     
-    foreach($onerrorinputs as $input) {
+    foreach(buildPermuations($goodinputs, 1) as $input) {
         $input[4] = "11111111";
         $return['inputs'][] = $input;
         $return['outputs'][] = buildOutput($input, "001");
     }
+    foreach(buildPermuations($goodinputs, 2) as $input) {
+        $input[4] = "11111111";
+        $return['inputs'][] = $input;
+        $return['outputs'][] = buildOutput($input, "010");
+    }
+    /*foreach(buildPermuations($goodinputs, 3) as $input) {
+        $input[4] = "11111111";
+        $return['inputs'][] = $input;
+        $return['outputs'][] = buildOutput($input, "111");
+    } TODO  Third failure causes all voted data after that point to be 0, needs modified test */
     
     return $return;
 }
 
 function buildOutput($inputs, $status) {
-    $word = strrev($inputs[0].$status);
+    $word = strrev($inputs[3].$status);
     $d0 = (((int)$word{0}) + ((int)$word{1}) + ((int)$word{3}) + ((int)$word{4}) + ((int)$word{6}) + ((int)$word{8}) + ((int)$word{10})) % 2;
     $d1 = (((int)$word{0}) + ((int)$word{2}) + ((int)$word{3}) + ((int)$word{5}) + ((int)$word{6}) + ((int)$word{9}) + ((int)$word{10})) % 2;
     $d2 = (((int)$word{1}) + ((int)$word{2}) + ((int)$word{3}) + ((int)$word{7}) + ((int)$word{8}) + ((int)$word{9}) + ((int)$word{10})) % 2;
@@ -108,5 +120,5 @@ foreach($data['inputs'] as $i => $input) {
 $vhd_inputs = substr($vhd_inputs, 0, -2);
 $vhd_outputs = substr($vhd_outputs, 0, -2);
 
-$template = str_replace(array('{inputs}', '{outputs}'), array($vhd_inputs, $vhd_outputs), $template);
+$template = str_replace(array('{inputs}', '{outputs}', '{count}'), array($vhd_inputs, $vhd_outputs, count($data['inputs'])), $template);
 file_put_contents(dirname(__DIR__).'/tests/liaison_tb_data.vhd', $template);

@@ -2,10 +2,8 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;		   
-use work.txt_util.all;
 
 entity output_block is 
-	generic (N : integer :=15);
 	port(
 		clk, reset	 : in std_logic;
 		voted_data 	 : in std_logic;
@@ -45,11 +43,15 @@ architecture arch of output_block is
 	signal shift : std_logic;
 	
 begin			
+    -- Pipe the data out signal from the input block out of the sytem
 	do_ready_out <= do_ready_in;   	
 	data_out <= muxed_data_out;
 	
+	-- Register infront of the ECC circuit, this accumulates the
+	-- 8-bit voted word as it passes out of our system
 	sipo: SIPOreg port map(clk, muxed_data_out, shift, sipo_data_out);
 	
+	-- Input the the ECC circuit, the 8-bit voted word and the current voter status
 	ecc_in <= sipo_data_out & voter_status;
 	
 	hamm: hamming_enc_11 port map(
@@ -73,13 +75,16 @@ begin
 		shift <= '0';
 		case current_state is
     		when VOTING => 				
+    		    -- While the input block is voting we keep shifting words into the register
 				shift <= '1';
+				-- .. and we send it straight through to the outside
 				muxed_data_out <= voted_data;
 				if voting_done = '1' then
 					next_state <= STATUS2;	
 	            else							   
 	                next_state <= VOTING;  
 	            end if;  
+	        -- Send all the remainding data to the outside system
 	        when STATUS2 =>	
 				next_state <= STATUS1;	 				 
 				muxed_data_out <= voter_status(2);

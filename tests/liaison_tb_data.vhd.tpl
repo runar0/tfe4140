@@ -3,7 +3,7 @@ use ieee.std_logic_1164.all;
 
 package liaison_tb_data is
 
-    constant count : integer := 256;
+    constant count : integer := {count};
 
     type inputvect_t is array(0 to count-1, 0 to 4) of std_logic_vector(7 downto 0);
     type outputvect_t is array(0 to count-1) of std_logic_vector(14 downto 0);
