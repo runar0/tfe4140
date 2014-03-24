@@ -2,7 +2,6 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;		   
-use work.txt_util.all;
 
 entity output_block is 
 	generic (N : integer :=15);
