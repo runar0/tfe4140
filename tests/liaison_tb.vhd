@@ -94,7 +94,7 @@ begin
 		    -- min 15 cycle between inputs, 15-7 = 8
 		    wait for clk_period*8;
 		    wait until falling_edge(clk);
-		    assert false report "Input #"&str(i)&" done";
+		    assert false report "Input #"&str(i)&" done" severity note;
 		end loop;
 		
 		assert false report "Liaison TB: input complete" severity note;
@@ -121,9 +121,9 @@ begin
 		    		    
 		    -- Compare actual and expected output
 		    if actual_output = output(i) then
-		        assert false report "Output "&str(i)&": OK";
+		        report "Output "&str(i)&": OK" severity warning;
 		    else 
-    		    assert false report "Output "&str(i)&": Expected " & str(output(i)) & " got " & str(actual_output) severity error;
+    		    report "Output "&str(i)&": Expected " & str(output(i)) & " got " & str(actual_output) severity error;
     		    errors := errors + 1;
     		end if;
 		end loop;
