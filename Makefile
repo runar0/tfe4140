@@ -12,7 +12,7 @@ test_voter: build
 	ghdl --elab-run voter_tb --stop-time=1100ns --wave=waves/voter.ghw
 
 test_input_block: build
-	ghdl --elab-run input_block_tb --stop-time=500ns --wave=waves/input_block.ghw
+	ghdl --elab-run input_block_tb --stop-time=800ns --wave=waves/input_block.ghw
 	
 test_output_block: build
 	ghdl --elab-run output_block_tb --stop-time=700ns --wave=waves/output_block.ghw
