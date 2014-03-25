@@ -80,7 +80,7 @@ begin
 	            voter_input <= mc_input;
 	            next_state <= BIT0;
 	        when BIT0 =>	   
-	            voter_input <= mc_input;  
+	            voter_input <= mc_input;  -- should this be 0? test with a 9th, wrong bit in input vector
 	            voting_done <= '1';
 	            next_state <= FINALIZE;
 			when FINALIZE =>		   		
