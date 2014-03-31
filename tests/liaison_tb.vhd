@@ -96,7 +96,7 @@ begin
 		    end loop;
 		    
 		    -- min 15 cycle between inputs, 15-7 = 8
-		    wait for clk_period*8;
+		    wait for clk_period*7;
 		    wait until falling_edge(clk);
 		    --report "Input #"&str(i)&" done" severity note;
 		end loop;
@@ -112,15 +112,17 @@ begin
 	    variable errors : integer := 0;
 	begin
 	    for i in output'range loop
-		    -- wait for output signal signal to be toggled
-		    wait until rising_edge(do_ready);
-		    -- Then for the falling edge, as this is when the external system samples
-		    wait until falling_edge(clk);
+		    -- Start reading when do_ready is high and clk is low, we cannot use rising edge
+		    -- here as do_ready may already be high when we reach this
+		    wait until do_ready = '1' and clk = '0';
 		    
 		    -- Build a actual output vector
 		    for j in output(i)'range loop
 		        actual_output(j) := voted_data;	
-		        wait until falling_edge(clk);
+		        
+		        if j /= 0 then
+    		        wait until falling_edge(clk);
+	            end if;
 		    end loop;
 		    		    
 		    -- Compare actual and expected output
