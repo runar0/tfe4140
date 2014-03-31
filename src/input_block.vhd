@@ -48,10 +48,10 @@ begin
     begin	
 		voting_done <= '0';
 	    do_ready <= '0';
+        voter_input <= mc_input;
     	case current_state is
     		when READY => 
 	            if di_ready = '1' then	
-	                voter_input <= mc_input;
 	                next_state <= BIT7;
 	            else
 	                voter_input <= (others => '0');
@@ -59,28 +59,21 @@ begin
 	            end if;  
 	        when BIT7 =>	
 				do_ready <= '1';   
-	            voter_input <= mc_input;
 	            next_state <= BIT6;
 	        when BIT6 =>		 
-	            voter_input <= mc_input;
 	            next_state <= BIT5;
 	        when BIT5 =>	   	
-	            voter_input <= mc_input;
 	            next_state <= BIT4;
 	        when BIT4 =>	   
-	            voter_input <= mc_input;
 	            next_state <= BIT3;
 	        when BIT3 =>		 
-	            voter_input <= mc_input;
 	            next_state <= BIT2;
 	        when BIT2 =>	   
-	            voter_input <= mc_input;
 	            next_state <= BIT1;
 	        when BIT1 =>	   
-	            voter_input <= mc_input;
 	            next_state <= BIT0;
 	        when BIT0 =>	   
-	            voter_input <= mc_input;  
+	            voter_input <= (others => '0');
 	            voting_done <= '1';
 	            next_state <= FINALIZE;
 			when FINALIZE =>		   		

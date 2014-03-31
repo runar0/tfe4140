@@ -55,7 +55,11 @@ begin
 	    wait for 3*clk_period;
 	    wait until falling_edge(clk);
 	    
-	    -- Test input of 10110010. All MCU's agree
+	    -- Ensure initial conditions are as expected
+	    assert status_out = "000" report "Initial status is "&str(status_out)&" expected 000";
+	    assert data_out = '0' report "Output bit is " & str(data_out) & " expected 0 outside of voting window";
+	    
+	    -- Test input of 10110011. All MCU's agree except for the last bit
 	    reset <= '0';
 	    di_ready <= '1';
 	    mc_input <= "1111";
@@ -96,17 +100,28 @@ begin
 	    assert data_out = '0' report "Sixth output bit is " & str(data_out) & " expected 0";
 	    wait until falling_edge(clk);
 	    
-	    mc_input <= "0000";
+	    mc_input <= "0111";
 	    wait until rising_edge(clk);
 	    assert data_out = '1' report "Seventh output bit is " & str(data_out) & " expected 1";
 	    wait until falling_edge(clk);
 	    
 	    wait until rising_edge(clk);
-	    assert data_out = '0' report "Eight output bit is " & str(data_out) & " expected 0";
+	    assert data_out = '1' report "Eight output bit is " & str(data_out) & " expected 0";
 	     	    
 	    assert (voting_done = '1') report "voting_done not 1 while last bit is outputted";
-	    assert (status_out = "000") report "Status is "&str(status_out)&" expected 000";
+	    assert (status_out = "001") report "Status is "&str(status_out)&" expected 000";
 	    
+	    -- Test that any noise on the lines will not affect the internal state
+        mc_input <= "1110";
+	    wait until rising_edge(clk);
+	    assert status_out = "001" report "Status was changed outside of the voting window was: "&str(status_out)&" expected: 001";
+	    assert data_out = '0' report "Data out not 0 outside of voting window (1 cycle after voting done)";
+	    wait until falling_edge(clk);	 
+	       
+	    mc_input <= "0000";
+	    wait until rising_edge(clk);
+	    assert status_out = "001" report "Status was changed outside of the voting window was: "&str(status_out)&" expected: 001";
+	    assert data_out = '0' report "Data out not 0 outside of voting window (2 cycle after voting done)";
 	    
         assert false report "VERIFICATION DONE." severity warning;
 	    
