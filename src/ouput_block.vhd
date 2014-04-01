@@ -43,7 +43,7 @@ architecture arch of output_block is
 	signal shift : std_logic;
 	
 	-- Hold voter status as it was at the last voting_done toggle
-	signal last_voter_status : std_logic_vector(2 downto 0);
+	--signal last_voter_status : std_logic_vector(2 downto 0);
 	
 begin			
     -- Pipe the data out signal from the input block out of the sytem
@@ -55,28 +55,25 @@ begin
 	sipo: SIPOreg port map(clk, muxed_data_out, shift, sipo_data_out);
 	
 	-- Input the the ECC circuit, the 8-bit voted word and the current voter status
-	ecc_in <= sipo_data_out & last_voter_status;
+	ecc_in <= sipo_data_out & voter_status;
 	
 	hamm: hamming_enc_11 port map(
 		data_in  => ecc_in,
 		data_out => ecc
 	); 				  		
 	
-	process(clk, reset, next_state, voter_status)
+	process(clk, reset, next_state)
 	begin
 	    if rising_edge(clk) then   			
 	    	if reset = '1' then
 		    	current_state <= VOTING; 	   	 		    	
 	    	else 	  		   			 
-		        current_state <= next_state;
-		        if next_state = STATUS2 then
-			        last_voter_status <= voter_status;				
-			    end if;
+		        current_state <= next_state;  
 	        end if;
 	    end if;
     end process;
     
-    process(current_state, voting_done, voted_data, last_voter_status, ecc)			   
+    process(current_state, voting_done, voted_data, voter_status, ecc)			   
     begin 			
 		shift <= '0';
 		case current_state is
@@ -93,13 +90,13 @@ begin
 	        -- Send all the remainding data to the outside system
 	        when STATUS2 =>	
 				next_state <= STATUS1;	 				 
-				muxed_data_out <= last_voter_status(2);
+				muxed_data_out <= voter_status(2);
 	        when STATUS1 =>	
 				next_state <= STATUS0;
-				muxed_data_out <= last_voter_status(1);
+				muxed_data_out <= voter_status(1);
 	        when STATUS0 =>		   		 	
 				next_state <= ECC3;
-				muxed_data_out <= last_voter_status(0);
+				muxed_data_out <= voter_status(0);
 	        when ECC3 =>	
 				next_state <= ECC2;
 				muxed_data_out <= ecc(3);

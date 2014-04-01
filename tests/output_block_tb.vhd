@@ -92,30 +92,21 @@ begin
 		voting_done <= '1';
 		wait until rising_edge(clk);
 		assert (data_out = '0') report "8. output bit not 0";
-		voting_done <= '0';
+		voting_done <= '0';								
 		
-		-- Now validate that the status and finally ecc comes out correct
-		--   Note: We have added sone noise on the voted_data and voter_status lines while reading, 
-		--         this could happen in di_ready is toggled with less than 15 cycle delay by the external
-		--         system. We want the output block to handle the first word ok, and only have the second
-		--         one mangled by this error
 		wait until rising_edge(clk);
-		assert (data_out = '0') report "data_out not 0 @ s(2)";
-		voter_status <= "001";
-		voted_data <= '1';
+		assert (data_out = '0') report "data_out not 0 @ s(2)";	 
 		wait until rising_edge(clk);
 		assert (data_out = '0') report "data_out not 0 @ s(1)";
 		wait until rising_edge(clk);
-		assert (data_out = '0') report "data_out not 0 @ s(0)"; 
-		voter_status <= "010";
+		assert (data_out = '0') report "data_out not 0 @ s(0)"; 	
 		wait for clk_period; 										
 		
 		--hamming code should be 0000 when v=10101010 and s=000
 		wait until rising_edge(clk);
 		assert (data_out = '0') report "data_out not 0 @ ecc(3)";
 		wait until rising_edge(clk);
-		assert (data_out = '0') report "data_out not 1 @ ecc(2)";
-		voter_status <= "111";
+		assert (data_out = '0') report "data_out not 1 @ ecc(2)";	 
 		wait until rising_edge(clk);
 		assert (data_out = '0') report "data_out not 0 @ ecc(1)";
 		wait until rising_edge(clk);

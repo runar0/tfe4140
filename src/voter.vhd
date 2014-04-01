@@ -31,8 +31,8 @@ begin
         if (rising_edge(clk)) then
             if (reset = '1') then
                 output <= '0';
-                status <= "000";
                 mask := "1111";
+                status <= "000";
             else
                 -- A(B+C+D) + B(C+D) + CD (dead mcu's contribute a 0)
                 -- We define that two 1's and two 0's produce a 1
@@ -46,14 +46,14 @@ begin
                 -- disagrees with the majority
                 wrong := (majority & majority & majority & majority) xor masked;
                 wrong := wrong and mask;
-                mask  := mask xor wrong;               
-                      
-			    state(0) := (mask(0) xor mask(1) xor mask(2) xor mask(3)) 
+                mask  := mask xor wrong;       
+                
+		        state(0) := (mask(0) xor mask(1) xor mask(2) xor mask(3)) 
 			        or not (mask(0) or mask(1) or mask(2) or mask(3));
 			    state(1) := (state(0) nor (mask(0) and mask(1) and mask(2) and mask(3)))
 				    or (state(0) and not ((mask(0) or mask(1)) and (mask(2) or mask(3))));
-			    status <= (state(1) and state(0)) & state;
-            end if;                
-        end if;    
+			    status <= (state(1) and state(0)) & state;      
+            end if;              
+        end if;    							  
     end process;
 end architecture;
