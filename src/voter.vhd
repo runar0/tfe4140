@@ -32,7 +32,6 @@ begin
             if (reset = '1') then
                 output <= '0';
                 status <= "000";
-                state := "00";
                 mask := "1111";
             else
                 -- A(B+C+D) + B(C+D) + CD (dead mcu's contribute a 0)
@@ -41,9 +40,6 @@ begin
                 majority := (masked(3) and (masked(2) or masked(1) or masked(0))) 
                     or (masked(2) and (masked(1) or masked(0))) 
                     or (masked(1) and masked(0));
-				
-				-- Assuming little to no errors in fauly mcu
-				-- majority := (inputs(0) or inputs(1)) and (inputs(2) or inputs(3));
                 output <= majority;
                     
                 -- Update the mask of any expected to be working mcu's to 0 if it 
@@ -51,14 +47,11 @@ begin
                 wrong := (majority & majority & majority & majority) xor masked;
                 wrong := wrong and mask;
                 mask  := mask xor wrong;               
-                                
-                if state = "11" then
-                    state := "11";
-                else 
-				    state(0) := mask(0) xor mask(1) xor mask(2) xor mask(3);
-				    state(1) := (state(0) nor (mask(0) and mask(1) and mask(2) and mask(3)))
-					    or (state(0) and not ((mask(0) or mask(1)) and (mask(2) or mask(3))));
-			    end if;
+                      
+			    state(0) := (mask(0) xor mask(1) xor mask(2) xor mask(3)) 
+			        or not (mask(0) or mask(1) or mask(2) or mask(3));
+			    state(1) := (state(0) nor (mask(0) and mask(1) and mask(2) and mask(3)))
+				    or (state(0) and not ((mask(0) or mask(1)) and (mask(2) or mask(3))));
 			    status <= (state(1) and state(0)) & state;
             end if;                
         end if;    

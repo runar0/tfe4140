@@ -62,20 +62,22 @@ begin
 		data_out => ecc
 	); 				  		
 	
-	process(clk, reset, next_state)
+	process(clk, reset, next_state, voter_status)
 	begin
 	    if rising_edge(clk) then   			
 	    	if reset = '1' then
-		    	current_state <= VOTING; 	   	 	
+		    	current_state <= VOTING; 	   	 		    	
 	    	else 	  		   			 
 		        current_state <= next_state;
+		        if next_state = STATUS2 then
+			        last_voter_status <= voter_status;				
+			    end if;
 	        end if;
 	    end if;
     end process;
     
-    process(current_state, voting_done, voted_data, voter_status, ecc)			   
+    process(current_state, voting_done, voted_data, last_voter_status, ecc)			   
     begin 			
-        last_voter_status <= last_voter_status;			
 		shift <= '0';
 		case current_state is
     		when VOTING => 				
@@ -85,7 +87,6 @@ begin
 				muxed_data_out <= voted_data;
 				if voting_done = '1' then
 					next_state <= STATUS2;
-					last_voter_status <= voter_status;	
 	            else							   
 	                next_state <= VOTING;  
 	            end if;  
